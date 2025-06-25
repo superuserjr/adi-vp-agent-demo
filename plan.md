@@ -31,123 +31,124 @@ For MVP, we'll use SWR with 1-second polling:
 2. **Use GitHub CLI** - Leverage existing `gh` auth for local development
 3. **Deploy Later** - Once working, deploy to Vercel with GitHub token
 
-## Quick Start Checklist
-- [ ] Run `./quickstart.sh` to set up project (first time)
-- [ ] Configure `.env.local` with `OPENAI_API_KEY`
-- [ ] Run `./quickstart.sh` again to start the app
-- [ ] Test all features locally
-- [ ] Deploy to Vercel when ready
+## Updated Staged Development Plan
 
-## Phase 1: Foundation (Day 0.5)
-**Goal:** Project scaffold and core infrastructure
+### Stage 1: Basic Frontend + First Agent ✅ COMPLETED
+- [x] Create Next.js 14 app with TypeScript
+- [x] Install LangChain.js and dependencies
+- [x] Build minimal UI with JD input (copy/paste)
+- [x] Implement JD Summarizer agent with GPT-4o
+- [x] Create `/api/summarize` route
+- [x] Display results in UI
+- [x] Add error handling
+- [x] **Test Point**: Can paste JD → get summary ✅
 
-### Setup
-- [ ] Create Next.js 14 app with TypeScript: `npx create-next-app@latest --typescript --tailwind --app`
-- [ ] Install LangChain.js: `npm install langchain @langchain/openai zod`
-- [ ] Install utilities: `npm install @vercel/kv react-dropzone swr`
-- [ ] Set up Tailwind CSS + shadcn/ui components
-- [ ] Configure environment variables in `.env.local`
+### Stage 2: Add Email Drafter (NEXT)
+- [ ] Add writing samples section to UI
+  - [ ] Copy/paste text input with "Add Sample" button
+  - [ ] List of added samples with delete option
+  - [ ] Character/word count display
+- [ ] Implement Email Drafter agent in `lib/agents/email-drafter.ts`
+  - [ ] Use writing samples for style matching
+  - [ ] Generate VP-level professional emails
+  - [ ] Return confidence score
+- [ ] Create `/api/draft` route
+- [ ] Update UI to show both JD summary and email draft
+- [ ] **Test Point**: Can add samples + JD → get summary + email
 
-### Project Structure
-- [ ] Create API routes in `app/api/`
-- [ ] Set up agent modules in `lib/agents/`
-- [ ] Create shared types in `types/`
-- [ ] Set up GitHub auth checker utility
+### Stage 3: GitHub Integration
+- [ ] Add company name input field
+- [ ] Implement GitHub Publisher agent
+  - [ ] Local: Use `gh` CLI via child_process
+  - [ ] Vercel: Use Octokit with GitHub token
+  - [ ] Smart folder structure: `submissions/{company}/`
+- [ ] Create `/api/publish` route
+- [ ] Show PR link on success
+- [ ] **Test Point**: Full workflow creates GitHub PR
 
-### DevOps
-- [ ] Configure Vercel project
-- [ ] Set up GitHub repository
-- [ ] Enable Vercel automatic deployments
+### Stage 4: Polish & Enhancement
+- [ ] Add real-time status updates (SWR polling)
+- [ ] Preview/edit capabilities before submission
+- [ ] Resume upload (PDF support)
+- [ ] Retry functionality for each agent
+- [ ] Improve error messages
+- [ ] Add loading states and transitions
 
-## Phase 2: Core Agents (Days 1-2)
-**Goal:** Implement and test all three agents
+## Technical Implementation Details
 
-### Day 1: JD Summarizer Agent
-- [ ] Implement in `lib/agents/jd-summarizer.ts` using LangChain.js
-- [ ] Use `ChatOpenAI` with `gpt-4o` model
-- [ ] Add Zod schema for structured output (max 300 words validation)
-- [ ] JSON output format: `{summary: string, key_requirements: string[], company_context: string}`
-- [ ] Create API route: `app/api/agents/summarize/route.ts`
-- [ ] Test with sample JDs
+### Completed Components
 
-### Day 2: VP Email Draft Agent
-- [ ] Implement in `lib/agents/email-drafter.ts` with few-shot examples
-- [ ] Dynamic sample ingestion using TypeScript
-- [ ] Use LangChain.js prompt templates for style matching
-- [ ] JSON output: `{email_body: string, subject: string, confidence_score: number}`
-- [ ] Create API route: `app/api/agents/draft/route.ts`
-- [ ] Test with 3-5 writing samples
+#### Frontend (app/page.tsx)
+- Clean, minimal interface
+- Textarea for job description input
+- Real-time display of analysis results
+- Error handling with user-friendly messages
 
-## Phase 3: GitHub Integration (Day 3)
-**Goal:** Smart repository organization
+#### API Routes
+- `/api/summarize` - Processes job descriptions with JD Summarizer
 
-### GitHub Publisher Agent
-- [ ] Implement in `lib/agents/github-publisher.ts`
-- [ ] **Local development**: Use `gh` CLI via Node.js child_process
-- [ ] **Vercel deployment**: Use Octokit with GitHub token
-- [ ] Environment detection: `process.env.VERCEL ? useOctokit() : useGhCLI()`
-- [ ] Folder structure: `submissions/{company_slug}/`
-- [ ] File naming: `role_summary.md`, `intro_email.md`, `resume.pdf`
-- [ ] Branch creation: `submit/{company_slug}-{YYYYMMDD}`
-- [ ] Auto-generate folder README with metadata
-- [ ] JSON output: `{repo_url: string, pr_url: string, commit_sha: string, files_created: string[]}`
-- [ ] Create API route: `app/api/agents/publish/route.ts`
+#### Agents
+- `lib/agents/jd-summarizer.ts` - GPT-4o powered analysis
+  - Extracts summary (max 300 words)
+  - Identifies 5-7 key requirements
+  - Provides company context
 
-## Phase 4: API & Orchestration (Day 4)
-**Goal:** Connect agents with Next.js API Routes
+#### Configuration
+- TypeScript paths fixed (`@/*` → `["./*"]`)
+- Environment variables configured (.env.local)
+- Tailwind CSS configured
 
-### API Routes
-- [ ] `POST /api/submit` - Accept JD, samples, resume
-- [ ] `GET /api/status/[taskId]` - Poll job status with agent results
-- [ ] `POST /api/retry` - Retry specific agent
-- [ ] `PUT /api/update` - Update agent output (after preview edit)
-- [ ] `POST /api/approve` - Approve and trigger GitHub push
-- [ ] `DELETE /api/sample` - Remove samples
-- [ ] State storage:
-  - [ ] Local: In-memory Map or localStorage
-  - [ ] Vercel: Use Vercel KV (add when deploying)
-- [ ] Error handling with proper status codes
+### Next Steps for Parallel Work
 
-### Agent Pipeline
-- [ ] Orchestration logic in `lib/orchestrator.ts`
-- [ ] Parallel agent execution using Promise.all
-- [ ] Result aggregation with TypeScript types
-- [ ] Client-side state management with SWR
+If another agent is working on later stages, they should focus on:
 
-## Phase 5: Frontend UI (Day 5)
-**Goal:** Beautiful, functional interface
+1. **Stage 3 Prerequisites**:
+   - Review `lib/agents/github-publisher.ts` stub
+   - Ensure GitHub CLI is authenticated locally
+   - Plan folder structure for submissions
 
-### Upload Interface
-- [ ] Company name input (with slug preview)
-- [ ] JD upload (file or paste)
-- [ ] Resume upload (PDF)
-- [ ] Writing samples manager
-  - [ ] File upload (PDF, TXT, MD)
-  - [ ] Paste raw text with title
-  - [ ] Drag-and-drop support for multiple files
-  - [ ] Sample list with preview & remove buttons
-  - [ ] Client-side character/word count
-  - [ ] Local storage persistence
+2. **Stage 4 Components**:
+   - Design preview panel component
+   - Plan SWR implementation for status polling
+   - Consider UI/UX for edit functionality
 
-### Status Dashboard
-- [ ] Real-time progress updates using SWR (1-second polling)
-- [ ] Preview panel for generated content
-  - [ ] JD summary preview with edit capability
-  - [ ] Email draft preview with edit capability
-  - [ ] Side-by-side comparison view
-- [ ] Retry button for each agent
-- [ ] Success state with GitHub PR link
-- [ ] Error handling with clear messages
-- [ ] Local storage for draft state (localStorage)
+3. **Shared Types**:
+   - Review `types/index.ts` for data structures
+   - Ensure consistency across agents
 
-## Phase 6: Polish & Demo (Day 5.5)
-**Goal:** Production-ready MVP
+### Environment & Dependencies
 
-### Testing
-- [ ] End-to-end workflow test
-- [ ] Error case handling
-- [ ] Performance optimization
+**Installed packages:**
+- Next.js 14 with TypeScript
+- @langchain/openai
+- zod (for schema validation)
+- SWR (for future polling)
+- react-dropzone (for future file uploads)
+- @vercel/kv (for future state management)
 
-### Documentation
-- [ ] API documentation
-- [ ] User guide
+**Required environment variables:**
+- `OPENAI_API_KEY` ✅ (configured)
+- `GITHUB_TOKEN` (needed for Vercel deployment)
+
+### Testing Instructions
+
+**Current functionality (Stage 1):**
+1. Server running at http://localhost:3000
+2. Paste any job description
+3. Click "Analyze Job Description"
+4. View structured analysis results
+
+**API testing:**
+```bash
+curl -X POST http://localhost:3000/api/summarize \
+  -H "Content-Type: application/json" \
+  -d '{"jobDescription": "Your JD text here"}'
+```
+
+## Notes for Parallel Development
+
+- All agents should follow the established TypeScript patterns
+- Use the types defined in `types/index.ts`
+- API routes should return consistent JSON structures
+- Keep UI minimal and clean per requirements
+- Test each stage independently before integration
