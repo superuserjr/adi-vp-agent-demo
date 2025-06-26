@@ -1,0 +1,60 @@
+Scott Benson
+scottrbenson@gmail.com ◈ (727) 249-9594 ◈ GitHub ◈ LinkedIn
+WORK EXPERIENCE
+SYPartners Apr. 2018 – Present
+Senior Enterprise System Operations Manager | March, 2023 – Present New York City, NY / Remote
+▪
+Tech Stack: VMware ESXi, AWS, Dell Servers, Dell Switches, Aruba, FortiGate, Sophos, Todyl, Veeam,
+Backblaze, OneLogin, Zoom, Slack, Mosyle, Jamf, Google Workspace
+▪
+Lead and mentor a global team supporting multiple businesses in a shared office space, adapting to evolving
+technology requirements and the dynamic needs of a consultant-driven environment while ensuring high-quality
+IT service delivery and seamless operations.
+▪
+Develop and implement IT strategies aligned with business objectives to enhance efficiency and security.
+▪
+Streamline onboarding and offboarding processes, integrating cutting-edge automation and identity
+management solutions.
+▪
+Optimize AWS infrastructure, achieving cost savings and improving system scalability.
+▪
+Partner with Security and Compliance teams to define and meet key operational and security objectives.
+▪
+Manage IT assets, SaaS management, endpoint security, cloud-based services, and vendor relationships to ensure
+reliable service and cost efficiency.
+▪
+Develop and enforce IT policies and best practices to enhance security and compliance.
+▪
+Stay up-to-date with emerging technologies to continuously improve IT operations and end-user experience.
+Network Administrator | August, 2019 – March, 2023
+▪
+Managed IT infrastructure for a distributed team, ensuring network performance, security, and reliability.
+▪
+Implemented security protocols and system optimizations, reducing downtime and improving efficiency.
+IT Administrator | April, 2018 – August, 2019
+▪
+Provided IT support and troubleshooting for enterprise-wide systems, ensuring high availability and reliability.
+Apple Inc April 2014 – April 2018
+Genius New York City, NY
+▪
+Provide expert technical support, hardware and software repair, and customer education for Apple products,
+ensuring exceptional customer service and seamless user experiences.
+CERTIFICATIONS
+▪
+▪
+▪
+▪
+▪
+AWS Certified Solutions Architect - Associate (Certified Since 2022)
+CompTIA Network+ (Certified Since 2019)
+CompTIA Security+ (Certified Since 2025)
+Jamf Certified Tech (Jamf 200) (Certified Since 2018)
+Apple Certified Mac & iOS Technician (Certified Since 2016)
+SKILLS & INTERESTS
+▪
+▪
+Skills: Apple, Windows Server, Linux, Cloud Security, TCP/IP, DNS, Firewalls, VPN, Active Directory, LDAP,
+RADIUS, Zero Trust Security, Endpoint Security, SIEM, EDR, DLP, Python, BASH/ZSH, PowerShell,
+Automation, System Integration, IT Asset Management, IT Policy Development, Identity Lifecycle
+Management, SSO, GitHub, Vendor & Stakeholder Negotiation, Project Management
+Interests: My son; road trips; gardening; reading; jet skiing; Slow Horses; Alamo Draft House
