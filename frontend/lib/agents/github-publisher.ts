@@ -35,10 +35,13 @@ export async function publishToGitHub(
       throw new Error('GitHub CLI not authenticated. Run: gh auth login');
     }
     
-    // Create folder structure
+    // Create folder structure at repository root
     const companySlug = slugify(companyName);
     const date = new Date().toISOString().split('T')[0];
-    const submissionDir = join(process.cwd(), 'submissions', companySlug);
+    
+    // Get the repository root (parent directory)
+    const repoRoot = join(process.cwd(), '..');
+    const submissionDir = join(repoRoot, 'submissions', companySlug);
     
     // Create directory
     await mkdir(submissionDir, { recursive: true });
@@ -110,8 +113,11 @@ This application was generated using the VP Agent Demo, an AI-powered job applic
     await writeFile(readmePath, readmeContent);
     files.push(`submissions/${companySlug}/README.md`);
     
-    // Git operations
+    // Git operations - run from repository root
     try {
+      // Change to repository root for git operations
+      process.chdir(repoRoot);
+      
       // Get current repo info
       const { stdout: repoUrl } = await execAsync('gh repo view --json url -q .url');
       const cleanRepoUrl = repoUrl.trim();
@@ -161,6 +167,9 @@ This application was automatically generated and organized using AI-powered anal
       // Switch back to main branch
       await execAsync('git checkout main');
       
+      // Change back to original directory
+      process.chdir(join(repoRoot, 'frontend'));
+      
       return {
         repo_url: cleanRepoUrl,
         pr_url: prUrl.trim(),
@@ -171,6 +180,10 @@ This application was automatically generated and organized using AI-powered anal
     } catch (error: any) {
       // If git operations fail, still return the local files created
       console.error('Git operations failed:', error);
+      
+      // Make sure to change back to original directory
+      process.chdir(join(repoRoot, 'frontend'));
+      
       return {
         repo_url: 'local',
         pr_url: 'local-only',
