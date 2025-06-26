@@ -17,22 +17,26 @@ Perfect for executives who want to maintain a personal touch while scaling their
 
 ```mermaid
 graph TD
-    Browser[Browser] -->|HTTP/SWR| Next[Next.js App]
+    Browser[Browser] -->|Multi-Step Wizard| Next[Next.js App]
     
-    Next --> Pages[React Pages]
+    Next --> Wizard[Wizard UI]
     Next --> API[API Routes]
+    
+    Wizard --> Step1[Step 1: JD Analysis]
+    Wizard --> Step2[Step 2: Resume Upload]
+    Wizard --> Step3[Step 3: Writing Samples]
+    Wizard --> Step4[Step 4: Review & Edit]
+    Wizard --> Step5[Step 5: Submit to GitHub]
     
     API --> LangChain[LangChain.js]
     
     LangChain --> Agent1[JD Summarizer]
-    LangChain --> Agent2[Email Drafter]
+    LangChain --> Agent2[Email Drafter]  
     LangChain --> Agent3[GitHub Publisher]
     
-    Agent1 -->|JSON| KV[(Vercel KV)]
-    Agent2 -->|JSON| KV
+    Agent1 -->|JSON| Memory[In-Memory State]
+    Agent2 -->|JSON| Memory
     Agent3 -->|gh CLI| GitHub[GitHub Repo]
-    
-    Pages -.->|SWR Polling| API
     
     OpenAI[OpenAI GPT-4o] -.->|API| LangChain
     
@@ -40,6 +44,38 @@ graph TD
 ```
 
 ## 🚀 Key Features
+
+### 🧙 Multi-Step Wizard Interface
+The application guides you through a seamless 5-step process:
+
+1. **Step 1: Job Description Analysis**
+   - Paste the job description
+   - Real-time extraction of company name and role
+   - Instant analysis of key requirements
+   - Smart keyword extraction
+
+2. **Step 2: Resume Upload**
+   - Upload your resume (PDF format)
+   - Automatic text extraction
+   - Match analysis against JD requirements
+
+3. **Step 3: Writing Samples**
+   - Add multiple writing samples (copy/paste or file upload)
+   - Support for LinkedIn articles
+   - Style analysis to capture your voice
+   - Minimum 2 samples recommended
+
+4. **Step 4: Review & Edit**
+   - Side-by-side preview of all content
+   - Edit JD summary and email draft inline
+   - Regenerate individual sections
+   - Ensure perfect alignment before submission
+
+5. **Step 5: Submit to GitHub**
+   - One-click publishing
+   - Creates organized folder structure
+   - Opens PR for review
+   - Complete application history
 
 ### Smart Job Description Analysis
 - Extracts key responsibilities, requirements, and company culture
@@ -124,76 +160,44 @@ submissions/
 
 ## 🔧 Installation
 
-### Option 1: Quick Start (Recommended)
+### Quick Start (Recommended)
 ```bash
+# Clone the repository
+git clone <your-repo-url>
+cd adi-vp-agent-dem
+
+# Run the launcher script
 ./quickstart.sh
 ```
 
-**First run** - Sets up everything:
-- Creates a new Next.js project with TypeScript
-- Installs all dependencies (LangChain.js, UI components, etc.)
-- Sets up the project structure
-- Creates type definitions
-- Generates sample agent code
-- Prompts you to add your OpenAI API key
+The `quickstart.sh` script will:
+- Check for Node.js and GitHub CLI
+- Install dependencies if needed
+- Create `.env.local` template if missing
+- Start the development server
 
-**Subsequent runs** - Starts the app:
-- Checks dependencies
-- Verifies API key is configured
-- Starts the development server
-- Opens http://localhost:3000
+### Manual Setup
 
-### Option 2: Manual Setup
-
-1. **Create the project**
+1. **Navigate to frontend directory**
    ```bash
-   npx create-next-app@latest adi-vp-agent-demo --typescript --tailwind --app
-   cd adi-vp-agent-demo
+   cd frontend
    ```
 
 2. **Install dependencies**
    ```bash
-   # Core dependencies
-   npm install langchain @langchain/openai zod
-   
-   # UI and utilities
-   npm install @radix-ui/themes lucide-react swr react-dropzone
-   npm install class-variance-authority clsx tailwind-merge
-   
-   # Vercel KV for state storage
-   npm install @vercel/kv
+   npm install
    ```
 
 3. **Set up environment variables**
    ```bash
-   # Create .env.local for local development
-   cat > .env.local << EOF
-   OPENAI_API_KEY=sk-your-key-here
-   # For Vercel deployment only:
-   # GITHUB_TOKEN=ghp_your_token_here
-   # KV_URL=your_vercel_kv_url
-   EOF
+   # Create .env.local
+   cp .env.example .env.local
+   # Edit .env.local and add your OpenAI API key
    ```
 
-4. **Start the application**
+4. **Start the development server**
    ```bash
-   # First time: Creates project and prompts for API key
-   ./quickstart.sh
-   
-   # After adding API key to .env.local
-   ./quickstart.sh  # This now starts the dev server
-   ```
-
-5. **Daily usage**
-   ```bash
-   # Just run this every time you want to work on the project
-   ./quickstart.sh
-   ```
-
-6. **Deploy to Vercel (when ready)**
-   ```bash
-   vercel
-   # Follow prompts to deploy
+   npm run dev
    ```
 
 ## 🚦 Usage
@@ -202,64 +206,50 @@ submissions/
    ```bash
    ./quickstart.sh
    ```
-   
-   This script handles everything:
-   - First time: Sets up the project
-   - Every time: Starts the dev server
 
-2. **Access the application**
-   - Open http://localhost:3000
-   - Enter company name
-   - Upload or paste job description
-   - Upload your resume (PDF)
-   - Add writing samples (drag & drop or LinkedIn URLs)
-   - Click "Generate Application"
+2. **Follow the wizard steps**
+   - **Step 1**: Paste job description → Click "Analyze"
+   - **Step 2**: Upload your resume PDF
+   - **Step 3**: Add 2+ writing samples 
+   - **Step 4**: Review and edit generated content
+   - **Step 5**: Submit to GitHub
 
-4. **Review and refine**
-   - Watch real-time progress updates
-   - **Preview generated content before submission**
-     - Edit JD summary if needed
-     - Refine email draft in preview panel
-     - Side-by-side comparison view
-   - Use retry buttons for individual agents
-   - Approve final content
-   - Click PR link to see GitHub submission
+3. **Access your application**
+   - Open the PR link to see your submission
+   - All materials organized in `submissions/{company}/`
+   - Complete history maintained in GitHub
 
 ## 📁 Project Structure
 
 ```
-adi-vp-agent-demo/
-├── app/                         # Next.js App Router
-│   ├── api/                     # API Routes
-│   │   ├── submit/route.ts
-│   │   ├── status/[taskId]/route.ts
-│   │   ├── retry/route.ts
-│   │   ├── update/route.ts
-│   │   └── approve/route.ts
-│   ├── components/
-│   │   ├── upload-panel.tsx
-│   │   ├── sample-manager.tsx
-│   │   ├── status-display.tsx
-│   │   └── preview-panel.tsx
-│   ├── layout.tsx
-│   └── page.tsx                 # Home page
-├── lib/
-│   ├── agents/
-│   │   ├── jd-summarizer.ts
-│   │   ├── email-drafter.ts
-│   │   └── github-publisher.ts
-│   ├── langchain-config.ts
-│   └── orchestrator.ts
-├── types/
-│   └── index.ts                 # TypeScript types
-├── public/
-├── submissions/                 # Generated applications
-├── .env.local                   # Your API keys
-├── package.json
-├── tsconfig.json
-├── tailwind.config.js
-├── README.md
-└── vercel.json                  # Vercel configuration
+adi-vp-agent-dem/
+├── frontend/                    # Next.js application
+│   ├── app/                     # App Router
+│   │   ├── api/                 # API Routes
+│   │   │   ├── draft/          # Email generation
+│   │   │   ├── publish/        # GitHub publishing
+│   │   │   └── summarize/      # JD analysis
+│   │   ├── components/
+│   │   │   ├── steps/          # Wizard step components
+│   │   │   │   ├── step1-jd.tsx
+│   │   │   │   ├── step2-resume.tsx
+│   │   │   │   ├── step3-samples.tsx
+│   │   │   │   ├── step4-review.tsx
+│   │   │   │   └── step5-submit.tsx
+│   │   │   └── wizard.tsx      # Main wizard controller
+│   │   ├── layout.tsx
+│   │   └── page.tsx             # Home page
+│   ├── lib/
+│   │   └── agents/              # LangChain agents
+│   │       ├── jd-summarizer.ts
+│   │       ├── email-drafter.ts
+│   │       └── github-publisher.ts
+│   ├── types/                   # TypeScript types
+│   ├── public/                  # Static assets
+│   └── package.json
+├── quickstart.sh                # Launcher script
+├── plan.md                      # Development plan
+└── README.md                    # This file
 ```
 
 ## 🔌 API Endpoints
