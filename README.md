@@ -17,30 +17,34 @@ Perfect for executives who want to maintain a personal touch while scaling their
 
 ```mermaid
 graph TD
-    Browser[Browser] -->|Multi-Step Wizard| Next[Next.js App]
+    User[User] -->|Starts App| Wizard[Multi-Step Wizard]
     
-    Next --> Wizard[Wizard UI]
-    Next --> API[API Routes]
+    Wizard --> Step1[Step 1: Paste JD]
+    Step1 -->|Analyze| API1[API: /api/summarize]
+    API1 -->|LangChain| JDAgent[JD Summarizer Agent]
+    JDAgent -->|Returns Summary| Step2[Step 2: Upload Resume]
     
-    Wizard --> Step1[Step 1: JD Analysis]
-    Wizard --> Step2[Step 2: Resume Upload]
-    Wizard --> Step3[Step 3: Writing Samples]
-    Wizard --> Step4[Step 4: Review & Edit]
-    Wizard --> Step5[Step 5: Submit to GitHub]
+    Step2 -->|Extract Text| Step3[Step 3: Add Writing Samples]
+    Step3 -->|Collect Samples| Step4[Step 4: Review & Generate]
     
-    API --> LangChain[LangChain.js]
+    Step4 -->|Generate Email| API2[API: /api/draft]
+    API2 -->|LangChain| EmailAgent[Email Drafter Agent]
+    EmailAgent -->|Uses Resume + Samples + JD| Step4Preview[Step 4: Preview Results]
     
-    LangChain --> Agent1[JD Summarizer]
-    LangChain --> Agent2[Email Drafter]  
-    LangChain --> Agent3[GitHub Publisher]
+    Step4Preview -->|Approve| Step5[Step 5: Submit]
+    Step5 -->|Publish| API3[API: /api/publish]
+    API3 -->|GitHub CLI| GitAgent[GitHub Publisher Agent]
+    GitAgent -->|Creates PR| Success[Success: View PR]
     
-    Agent1 -->|JSON| Memory[In-Memory State]
-    Agent2 -->|JSON| Memory
-    Agent3 -->|gh CLI| GitHub[GitHub Repo]
+    JDAgent -.->|GPT-4o| OpenAI[OpenAI API]
+    EmailAgent -.->|GPT-4o| OpenAI
     
-    OpenAI[OpenAI GPT-4o] -.->|API| LangChain
-    
-    Vercel[Vercel Platform] -->|Deploy| Next
+    style Step1 fill:#e1f5fe
+    style Step2 fill:#e1f5fe
+    style Step3 fill:#e1f5fe
+    style Step4 fill:#e1f5fe
+    style Step5 fill:#e1f5fe
+    style Success fill:#c8e6c9
 ```
 
 ## 🚀 Key Features
