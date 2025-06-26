@@ -38,10 +38,11 @@ export async function publishToGitHub(
     // Create folder structure at repository root
     const companySlug = slugify(companyName);
     const date = new Date().toISOString().split('T')[0];
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5); // YYYY-MM-DDTHH-MM-SS
     
     // Get the repository root (parent directory)
     const repoRoot = join(process.cwd(), '..');
-    const submissionDir = join(repoRoot, 'submissions', companySlug);
+    const submissionDir = join(repoRoot, 'submissions', companySlug, timestamp);
     
     // Create directory
     await mkdir(submissionDir, { recursive: true });
@@ -66,7 +67,7 @@ ${jdSummary.company_context}
 *Generated on ${new Date().toLocaleString()}*
 `;
     await writeFile(summaryPath, summaryContent);
-    files.push(`submissions/${companySlug}/role_summary.md`);
+    files.push(`submissions/${companySlug}/${timestamp}/role_summary.md`);
     
     // 2. Email Draft
     const emailPath = join(submissionDir, 'intro_email.md');
@@ -84,12 +85,12 @@ ${emailDraft.email_body}
 *Generated on ${new Date().toLocaleString()}*
 `;
     await writeFile(emailPath, emailContent);
-    files.push(`submissions/${companySlug}/intro_email.md`);
+    files.push(`submissions/${companySlug}/${timestamp}/intro_email.md`);
     
     // 3. Resume
     const resumePath = join(submissionDir, 'resume.txt');
     await writeFile(resumePath, resume);
-    files.push(`submissions/${companySlug}/resume.txt`);
+    files.push(`submissions/${companySlug}/${timestamp}/resume.txt`);
     
     // 4. README for the folder
     const readmePath = join(submissionDir, 'README.md');
@@ -105,13 +106,14 @@ This folder contains my application materials for ${companyName}.
 ## Application Details
 - **Company:** ${companyName}
 - **Applied on:** ${new Date().toLocaleDateString()}
+- **Applied at:** ${new Date().toLocaleTimeString()}
 - **Status:** Pending
 
 ## Notes
 This application was generated using the VP Agent Demo, an AI-powered job application assistant.
 `;
     await writeFile(readmePath, readmeContent);
-    files.push(`submissions/${companySlug}/README.md`);
+    files.push(`submissions/${companySlug}/${timestamp}/README.md`);
     
     // Git operations - run from repository root
     try {
@@ -119,15 +121,25 @@ This application was generated using the VP Agent Demo, an AI-powered job applic
       process.chdir(repoRoot);
       
       // Get current repo info
+      console.log('Getting repo info...');
       const { stdout: repoUrl } = await execAsync('gh repo view --json url -q .url');
       const cleanRepoUrl = repoUrl.trim();
       
       // Create a new branch
       const branchName = `submit/${companySlug}-${date}`;
+      console.log(`Creating branch: ${branchName}`);
       await execAsync(`git checkout -b ${branchName}`);
       
       // Add files
-      await execAsync('git add submissions/');
+      console.log('Adding files to git...');
+      await execAsync('git add -f submissions/');
+      
+      // Check if there are changes to commit
+      const { stdout: gitStatus } = await execAsync('git status --porcelain submissions/');
+      if (!gitStatus.trim()) {
+        console.error('No changes to commit - files may already exist');
+        throw new Error('No changes to commit');
+      }
       
       // Commit
       const commitMessage = `Add application for ${companyName}
@@ -137,9 +149,11 @@ This application was generated using the VP Agent Demo, an AI-powered job applic
 - Resume
 - Application folder README`;
       
+      console.log('Committing changes...');
       await execAsync(`git commit -m "${commitMessage}"`);
       
       // Push branch
+      console.log('Pushing branch to origin...');
       await execAsync(`git push origin ${branchName}`);
       
       // Create PR
@@ -157,6 +171,7 @@ This application was automatically generated and organized using AI-powered anal
 ---
 *Please review the materials and merge when ready to track this application.*`;
       
+      console.log('Creating pull request...');
       const { stdout: prUrl } = await execAsync(
         `gh pr create --title "${prTitle}" --body "${prBody}" --base main`
       );
@@ -180,6 +195,8 @@ This application was automatically generated and organized using AI-powered anal
     } catch (error: any) {
       // If git operations fail, still return the local files created
       console.error('Git operations failed:', error);
+      console.error('Error details:', error.message);
+      console.error('Error command:', error.cmd);
       
       // Make sure to change back to original directory
       process.chdir(join(repoRoot, 'frontend'));

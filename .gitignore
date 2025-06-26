@@ -52,7 +52,6 @@ yarn-error.log*
 Thumbs.db
 
 # Project specific
-/submissions/
 /logs/
 *.log
 
