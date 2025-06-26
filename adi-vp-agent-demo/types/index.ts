@@ -1,4 +1,5 @@
 export interface JDSummary {
+  company_name: string;
   summary: string;
   key_requirements: string[];
   company_context: string;
