@@ -126,7 +126,7 @@ This application was generated using the VP Agent Demo, an AI-powered job applic
       const cleanRepoUrl = repoUrl.trim();
       
       // Create a new branch
-      const branchName = `submit/${companySlug}-${date}`;
+      const branchName = `submit/${companySlug}-${timestamp}`;
       console.log(`Creating branch: ${branchName}`);
       await execAsync(`git checkout -b ${branchName}`);
       
